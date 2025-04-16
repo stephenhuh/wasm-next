@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import Script from 'next/script';
+import CameraScript from '@/components/CameraScript';
 import Link from 'next/link';
 
 // Use dynamic import with SSR disabled for the camera component
@@ -38,12 +38,22 @@ const CameraControl = dynamic(() =>
 );
 
 export default function CameraPage() {
-  // We'll use Next.js Script component to load our camera module
+  const [scriptLoaded, setScriptLoaded] = useState(false);
+
+  // Handle script loading
+  const handleScriptLoad = () => {
+    console.log('Camera script loaded');
+    setScriptLoaded(true);
+  };
+
+  const handleScriptError = (error) => {
+    console.error('Error loading camera script:', error);
+  };
 
   return (
     <div className="container">
-      {/* Load the camera module */}
-      <Script src="/wasm-modules/camera-global.js" strategy="beforeInteractive" />
+      {/* Load the camera module inline */}
+      <CameraScript />
       <header>
         <h1>DSLR Camera Control</h1>
         <p>Control your DSLR camera directly from the browser using WebUSB</p>
@@ -53,7 +63,13 @@ export default function CameraPage() {
       </header>
 
       <main>
-        <CameraControl />
+        {scriptLoaded ? (
+          <CameraControl />
+        ) : (
+          <div className="loading-container">
+            <p>Loading camera module...</p>
+          </div>
+        )}
       </main>
 
       <footer>

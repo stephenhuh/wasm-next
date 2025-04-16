@@ -177,4 +177,10 @@
 
   // Make Camera available globally
   window.Camera = Camera;
+
+  // Log that the Camera object is available
+  console.log('Camera object is now available globally');
+
+  // Dispatch an event to notify that the Camera is ready
+  window.dispatchEvent(new CustomEvent('camera-ready'));
 })();

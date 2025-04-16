@@ -1,73 +1,60 @@
+// next.config.js
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // Disable TypeScript type checking
     typescript: {
-        // !! WARN !!
-        // Dangerously allow production builds to successfully complete even if
-        // your project has type errors.
-        // !! WARN !!
         ignoreBuildErrors: true,
     },
-    webpack(config, { isServer, dev, webpack }) {
-        // Use the client static directory in the server bundle and prod mode
-        // Fixes `Error occurred prerendering page "/"`
-        config.output.webassemblyModuleFilename =
-            isServer && !dev
-                ? '../static/pkg/[modulehash].wasm'
-                : 'static/pkg/[modulehash].wasm'
+    reactStrictMode: true, // Recommended, but can be adjusted
 
-        // Enhanced WebAssembly support for web-gphoto2
-        config.experiments = {
-            ...config.experiments,
-            asyncWebAssembly: true,
-            syncWebAssembly: true,
-            topLevelAwait: true
-        }
-
-        // Add WASM as a known asset
-        if (!config.resolve.extensions) {
-            config.resolve.extensions = [];
-        }
-        config.resolve.extensions.push('.wasm');
-
-        // Optimize WASM loading
-        config.module.rules.push({
-            test: /\.wasm$/,
-            type: 'webassembly/async',
-        });
-
-        // https://nextjs.org/docs/app/building-your-application/optimizing/memory-usage#disable-webpack-cache
-        // This just stops building altogether:
-        // if (config.cache && !dev) {
-        //     config.cache = Object.freeze({
-        //         type: 'memory',
-        //     })
-        // }
-
-        // Debugging (vercel/next.js/issues/27650)
-        config.infrastructureLogging = { debug: /PackFileCache/ }
-
-        return config
-    },
-
-    // Add headers required for SharedArrayBuffer (needed by web-gphoto2)
+    // 1. Set COOP and COEP headers required by SharedArrayBuffer (used by web-gphoto2)
     async headers() {
         return [
             {
+                // Apply these headers to all routes
                 source: '/(.*)',
                 headers: [
                     {
                         key: 'Cross-Origin-Opener-Policy',
-                        value: 'same-origin',
+                        value: 'same-origin', // Required for SharedArrayBuffer
                     },
                     {
                         key: 'Cross-Origin-Embedder-Policy',
-                        value: 'require-corp',
+                        value: 'require-corp', // Required for SharedArrayBuffer
                     },
                 ],
             },
         ];
     },
-}
 
-module.exports = nextConfig
+    // 2. Configure Webpack for WASM support
+    webpack: (config, { isServer }) => {
+        // Enable asynchronous WebAssembly modules
+        config.experiments = {
+            ...config.experiments,
+            asyncWebAssembly: true,
+            layers: true, // Often used with asyncWebAssembly
+        };
+
+        // --- Optional Troubleshooting Step ---
+        // If you encounter 404 errors for the .wasm file after deploying to Vercel,
+        // uncomment and potentially adjust the paths below. This explicitly tells
+        // Webpack where to place the WASM file in the build output.
+        /*
+        if (!isServer) {
+          // For client-side bundles, place WASM in static/wasm
+          config.output.webassemblyModuleFilename = 'static/wasm/[modulehash].wasm';
+        } else {
+          // For server-side bundles, adjust path relative to the server output
+          // This might be needed if WASM is somehow used during SSR/SSG, though unlikely for web-gphoto2
+          config.output.webassemblyModuleFilename = '../static/wasm/[modulehash].wasm';
+        }
+        */
+        // --- End Optional Step ---
+
+        // Important: return the modified config
+        return config;
+    },
+};
+
+module.exports = nextConfig;

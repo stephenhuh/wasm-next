@@ -40,6 +40,7 @@ export default function CameraControl() {
   const [supportedOps, setSupportedOps] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSupported, setIsSupported] = useState(true);
+  const [isCameraModuleReady, setIsCameraModuleReady] = useState(false);
 
   const previewRef = useRef<HTMLImageElement>(null);
   const previewIntervalRef = useRef<number | null>(null);
@@ -48,11 +49,45 @@ export default function CameraControl() {
   useEffect(() => {
     // Check if we're in a browser environment
     if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
-      // Use type assertion to bypass TypeScript check
+      // Check if WebUSB is supported
       const nav = navigator as any;
       if (!nav.usb) {
         setIsSupported(false);
         setError('Your browser does not support WebUSB, which is required for camera control. Please use Chrome or Edge on desktop.');
+        return;
+      }
+
+      // Check if Camera object is already available
+      if (window.Camera) {
+        console.log('Camera module already available');
+        setIsCameraModuleReady(true);
+      } else {
+        console.log('Waiting for Camera module to load...');
+
+        // Listen for the camera-ready event
+        const handleCameraReady = () => {
+          console.log('Camera module ready event received');
+          setIsCameraModuleReady(true);
+        };
+
+        window.addEventListener('camera-ready', handleCameraReady);
+
+        // Check again after a short delay in case we missed the event
+        const timeoutId = setTimeout(() => {
+          if (window.Camera) {
+            console.log('Camera module detected after timeout');
+            setIsCameraModuleReady(true);
+          } else {
+            console.error('Camera module not found after timeout');
+            setError('Camera module not loaded properly. Please refresh the page and try again.');
+          }
+        }, 2000);
+
+        // Clean up
+        return () => {
+          window.removeEventListener('camera-ready', handleCameraReady);
+          clearTimeout(timeoutId);
+        };
       }
     }
   }, []);
@@ -255,6 +290,15 @@ export default function CameraControl() {
       ssr: false
     });
     return <CameraFallback />;
+  }
+
+  // If Camera module is not ready yet
+  if (!isCameraModuleReady) {
+    return (
+      <div className="loading-container">
+        <p>Loading camera module...</p>
+      </div>
+    );
   }
 
   return (
