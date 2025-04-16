@@ -7,17 +7,32 @@ import Link from 'next/link';
 
 // Use dynamic import with SSR disabled for the camera component
 // This is necessary because WebUSB is only available in the browser
-const CameraControl = dynamic(() => import('@/components/CameraControl').catch(err => {
-  console.error('Error loading CameraControl component:', err);
-  return () => <div className="error-message">
+// Define the error component with a display name
+const CameraErrorComponent = ({ error }: { error: Error }) => (
+  <div className="error-message">
     <h2>Error Loading Camera Module</h2>
     <p>There was a problem loading the camera module. This might be due to browser compatibility issues.</p>
-    <p>Technical details: {err.message}</p>
-  </div>;
-}), {
-  ssr: false,
-  loading: () => <div className="loading">Loading camera module...</div>
-});
+    <p>Technical details: {error.message}</p>
+  </div>
+);
+CameraErrorComponent.displayName = 'CameraErrorComponent';
+
+// Define the loading component with a display name
+const LoadingComponent = () => <div className="loading">Loading camera module...</div>;
+LoadingComponent.displayName = 'LoadingComponent';
+
+// Use dynamic import with proper display names
+const CameraControl = dynamic(() =>
+  import('@/components/CameraControl')
+    .catch(err => {
+      console.error('Error loading CameraControl component:', err);
+      return () => <CameraErrorComponent error={err} />;
+    }),
+  {
+    ssr: false,
+    loading: () => <LoadingComponent />
+  }
+);
 
 export default function CameraPage() {
   // We'll use Next.js Script component to load our camera module

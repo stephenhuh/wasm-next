@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import Script from 'next/script';
+import Image from 'next/image';
 import styles from '@/styles/styles.module.css';
 
 // Define the Camera type for TypeScript
@@ -65,7 +66,7 @@ export default function CameraControl() {
 
       // If user cancelled, just return without error
       if (deviceSelected === false) {
-        setError('Device selection cancelled. Please try again when youre ready.');
+        setError('Device selection cancelled. Please try again when you\'re ready.');
         return;
       }
 
@@ -96,7 +97,7 @@ export default function CameraControl() {
       if (error instanceof Error) {
         // For NotFoundError (device not selected), show a friendly message
         if (error.name === 'NotFoundError' && error.message.includes('No device selected')) {
-          setError('Device selection cancelled. Please try again when youre ready.');
+          setError('Device selection cancelled. Please try again when you\'re ready.');
         }
         // For SecurityError (permission denied), show a specific message
         else if (error.name === 'SecurityError') {
@@ -275,11 +276,14 @@ export default function CameraControl() {
         <div className="camera-interface">
           <div className="preview-container">
             {preview ? (
-              <img
+              <Image
                 ref={previewRef}
                 src={preview}
                 alt="Camera preview"
                 className="camera-preview"
+                width={640}
+                height={480}
+                unoptimized
               />
             ) : (
               <div className="preview-placeholder">
