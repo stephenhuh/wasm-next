@@ -45,9 +45,13 @@ export default function CameraControl() {
 
   // Check browser compatibility
   useEffect(() => {
-    if (typeof navigator !== 'undefined' && !navigator.usb) {
-      setIsSupported(false);
-      setError('Your browser does not support WebUSB, which is required for camera control. Please use Chrome or Edge on desktop.');
+    // Check if we're in a browser environment
+    if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
+      // Check if WebUSB is supported
+      if (!('usb' in navigator)) {
+        setIsSupported(false);
+        setError('Your browser does not support WebUSB, which is required for camera control. Please use Chrome or Edge on desktop.');
+      }
     }
   }, []);
 

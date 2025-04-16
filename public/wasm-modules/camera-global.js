@@ -8,6 +8,11 @@
 
     static async showPicker() {
       try {
+        // Check if WebUSB is supported
+        if (!navigator.usb) {
+          throw new Error('WebUSB is not supported in this browser');
+        }
+
         // Show the browser's USB device picker
         await navigator.usb.requestDevice({
           filters: [
