@@ -34,28 +34,43 @@ export default function Home() {
     return (
         <>
         <div>
-        <Control
-            number1={Number1}
-            number2={Number2}
-            handleNumber1Change={setNumber1}
-            handleNumber2Change={setNumber2}
-        />
-        <WasmAddTwo number1={Number1} number2={Number2} />
-        <WasmVectorMult vector1={Vector1} vector2={Vector2} />
+            {/* Camera Demo Link */}
+            <div style={{
+                position: 'fixed',
+                top: '20px',
+                right: '20px',
+                zIndex: 100,
+                background: '#0070f3',
+                padding: '10px 20px',
+                borderRadius: '5px',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+            }}>
+                <Link href="/camera" style={{ color: 'white', textDecoration: 'none', fontWeight: 'bold' }}>
+                    Try Camera Demo →
+                </Link>
+            </div>
 
-        <WasmBindGenCalc
-            filename1={filename1}
-            filename2={filename2}
-            varnames={varnames}
-            nentries={nentries}
-        />
-        <WasmBindGenCalc2
-            filename1={filename1}
-            filename2={filename2}
-            varnames={varnames}
-            nentries={nentries}
-        />
+            <Control
+                number1={Number1}
+                number2={Number2}
+                handleNumber1Change={setNumber1}
+                handleNumber2Change={setNumber2}
+            />
+            <WasmAddTwo number1={Number1} number2={Number2} />
+            <WasmVectorMult vector1={Vector1} vector2={Vector2} />
 
+            <WasmBindGenCalc
+                filename1={filename1}
+                filename2={filename2}
+                varnames={varnames}
+                nentries={nentries}
+            />
+            <WasmBindGenCalc2
+                filename1={filename1}
+                filename2={filename2}
+                varnames={varnames}
+                nentries={nentries}
+            />
         </div>
         </>
     )

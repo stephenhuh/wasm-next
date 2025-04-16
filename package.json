@@ -11,7 +11,8 @@
         "next": "^15.0.3",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
-        "react-select": "^5.8.0"
+        "react-select": "^5.8.0",
+        "web-gphoto2": "^0.4.1"
     },
     "devDependencies": {
         "@types/node": "^22.10.1",

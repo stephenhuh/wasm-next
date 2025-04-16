@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    webpack ( config, { isServer, dev, webpack }) {
+    webpack(config, { isServer, dev, webpack }) {
         // Use the client static directory in the server bundle and prod mode
         // Fixes `Error occurred prerendering page "/"`
         config.output.webassemblyModuleFilename =
@@ -8,8 +8,25 @@ const nextConfig = {
                 ? '../static/pkg/[modulehash].wasm'
                 : 'static/pkg/[modulehash].wasm'
 
-        // Since Webpack 5 doesn't enable WebAssembly by default, we should do it manually
-        config.experiments = { ...config.experiments, asyncWebAssembly: true }
+        // Enhanced WebAssembly support for web-gphoto2
+        config.experiments = {
+            ...config.experiments,
+            asyncWebAssembly: true,
+            syncWebAssembly: true,
+            topLevelAwait: true
+        }
+
+        // Add WASM as a known asset
+        if (!config.resolve.extensions) {
+            config.resolve.extensions = [];
+        }
+        config.resolve.extensions.push('.wasm');
+
+        // Optimize WASM loading
+        config.module.rules.push({
+            test: /\.wasm$/,
+            type: 'webassembly/async',
+        });
 
         // https://nextjs.org/docs/app/building-your-application/optimizing/memory-usage#disable-webpack-cache
         // This just stops building altogether:
@@ -19,10 +36,29 @@ const nextConfig = {
         //     })
         // }
 
-        // Deubbing (vercel/next.js/issues/27650)
+        // Debugging (vercel/next.js/issues/27650)
         config.infrastructureLogging = { debug: /PackFileCache/ }
 
         return config
+    },
+
+    // Add headers required for SharedArrayBuffer (needed by web-gphoto2)
+    async headers() {
+        return [
+            {
+                source: '/(.*)',
+                headers: [
+                    {
+                        key: 'Cross-Origin-Opener-Policy',
+                        value: 'same-origin',
+                    },
+                    {
+                        key: 'Cross-Origin-Embedder-Policy',
+                        value: 'require-corp',
+                    },
+                ],
+            },
+        ];
     },
 }
 
