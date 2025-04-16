@@ -26,7 +26,9 @@ const CameraControl = dynamic(() =>
   import('@/components/CameraControl')
     .catch(err => {
       console.error('Error loading CameraControl component:', err);
-      return () => <CameraErrorComponent error={err} />;
+      const ErrorWrapper = () => <CameraErrorComponent error={err} />;
+      ErrorWrapper.displayName = 'ErrorWrapper';
+      return ErrorWrapper;
     }),
   {
     ssr: false,

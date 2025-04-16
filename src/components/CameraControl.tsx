@@ -269,7 +269,7 @@ export default function CameraControl() {
             Connect Camera
           </button>
           <p>
-            This will open your browser's USB device picker. Select your camera to connect.
+            This will open your browser&apos;s USB device picker. Select your camera to connect.
           </p>
         </div>
       ) : (
