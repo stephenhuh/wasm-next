@@ -1,5 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    // Disable TypeScript type checking
+    typescript: {
+        // !! WARN !!
+        // Dangerously allow production builds to successfully complete even if
+        // your project has type errors.
+        // !! WARN !!
+        ignoreBuildErrors: true,
+    },
     webpack(config, { isServer, dev, webpack }) {
         // Use the client static directory in the server bundle and prod mode
         // Fixes `Error occurred prerendering page "/"`

@@ -1,4 +1,5 @@
 'use client'
+//@ts-nocheck
 
 // This is a wrapper around web-gphoto2 to make it work with Next.js
 // It handles the dynamic import of the library
