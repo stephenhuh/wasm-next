@@ -6,7 +6,7 @@ import { useCamera } from '@/lib/use-camera';
 // Infer the hook's return type so `status` is correctly typed as a union
 type UseCameraReturn = ReturnType<typeof useCamera>;
 
-export function CameraCapture(): JSX.Element {
+const CameraCapture = () => {
 	const {
 		status,
 		error,
@@ -117,3 +117,6 @@ export function CameraCapture(): JSX.Element {
 		</div>
 	);
 }
+
+
+export default CameraCapture;

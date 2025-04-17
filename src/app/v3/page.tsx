@@ -1,4 +1,4 @@
-import { CameraControl } from '../../components/v3/camera-v3';
+import CameraControl from '@/components/v3/camera-v3';
 
 export default function V3() {
 	return (
